@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 
 @CrossOrigin
@@ -150,5 +152,36 @@ public class ManagerController {
     public ResponseEntity<List<PieChartDTO>>getPercentageOfProduct(){
         return shoppingManagerService.getSoldPercentage();
     }
+
+    @GetMapping("viewOrder")
+    public ResponseEntity<List<Orders>>getListOfOrders(){
+        return shoppingManagerService.getListOfOrders();
+    }
+
+    @GetMapping("getEmailByOrderId/{id}")
+    public  ResponseEntity<String> getEmailByprodId(@PathVariable("id") String orderId){
+        int order_id = Integer.parseInt(orderId);
+        return  shoppingManagerService.getEmailBYOrderId(order_id);
+
+    }
+
+    @GetMapping("getTotalPriceMonthly")
+    public ResponseEntity<HashMap<String, Double>> getTotalAmountMonthly(){
+        return shoppingManagerService.getTotalAmountOfElectronicsAndClothings();
+    }
+
+    @GetMapping("getTotalPriceMonthlyForClothing")
+    public ResponseEntity<HashMap<String, Double>> getTotalAmountMonthlyForClothing(){
+        return shoppingManagerService.getTotalAmountOfClothing();
+    }
+
+    @GetMapping("getTotalPriceMontlyForElectronics")
+    public  ResponseEntity<HashMap<String,Double>> getTotalAmountMonthlyForElectronics(){
+        return shoppingManagerService.getTotalAmountOfElectronics();
+    }
+
+
+
+
 
 }

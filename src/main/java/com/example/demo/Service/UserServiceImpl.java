@@ -7,6 +7,7 @@ import com.example.demo.Entities.User;
 import com.example.demo.Repositories.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.servlet.Servlet;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,6 +46,7 @@ public class UserServiceImpl implements UserService {
     private OrderListRepository orderListRepository;
     @Autowired
     private SelectedProductRepository selectedProductRepository;
+
 
     @PersistenceContext
     EntityManager entityManager;
@@ -107,6 +109,7 @@ public class UserServiceImpl implements UserService {
         User user1 = userRepository.findByEmail(email).get();
         return user1.getId();
     }
+
 
     @Transactional(rollbackFor = {SQLException.class, Exception.class})
     public ResponseEntity<SelectedItems> selectedProduct(SelectedItems selectedItems, String email) {
@@ -172,6 +175,27 @@ public class UserServiceImpl implements UserService {
         }
         return ResponseEntity.ok().body(null);
     }
+
+    @Override
+    public ResponseEntity<ArrayList<String>> getUserRoles(int user_id) {
+
+        String sql = "select r.name from user_role u Inner join `role` r ON u.role_id = r.role_id where u.user_id = " + user_id;
+
+        // Execute the query and retrieve the result list
+        Query nativeQuery = entityManager.createNativeQuery(sql);
+        List<Object> resultList = nativeQuery.getResultList(); // Return as List<Object>
+
+        // Convert the result list to an ArrayList of Strings
+        ArrayList<String> listOfRoles = new ArrayList<>();
+        for (Object roleName : resultList) {
+            listOfRoles.add((String) roleName); // Cast each result to a String and add to the list
+        }
+
+        // Return the list of roles as a ResponseEntity
+        return ResponseEntity.ok().body(listOfRoles);
+
+    }
+
 
 
 

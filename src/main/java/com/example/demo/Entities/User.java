@@ -28,6 +28,9 @@ public class User implements UserDetails {
     @Column(name = "user_id")
     private int id;
 
+    @Column(name="role")
+    private String role;
+
     @Column(name = "name")
     private String userName;
 
@@ -52,6 +55,7 @@ public class User implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Collection<Role> roles = new ArrayList<>();
+
 
 
 

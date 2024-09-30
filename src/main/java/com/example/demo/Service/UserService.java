@@ -27,6 +27,8 @@ public interface UserService {
 
     public int findbyEmail(String email);
 
+    public ResponseEntity<ArrayList<String>> getUserRoles(int user_id);
+
 
 
 

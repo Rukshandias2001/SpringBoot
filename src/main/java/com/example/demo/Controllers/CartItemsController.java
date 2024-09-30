@@ -10,6 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Struct;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -67,7 +70,7 @@ public class CartItemsController {
 
 
     @PostMapping("saveOrder")
-    public ResponseEntity saveOrder(@RequestBody  OrderRequest orderRequest){
+    public ResponseEntity saveOrder(@RequestBody  OrderRequest orderRequest) throws ParseException {
 
         Orders order = new Orders();
         order.setDate(orderRequest.getExpiryDate());
@@ -75,6 +78,13 @@ public class CartItemsController {
         order.setCvv(orderRequest.getCvv());
         order.setCardType(orderRequest.getCardType());
         order.setPaidDate(orderRequest.getDate());
+        // Create a SimpleDateFormat for the desired format
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        // Get today's date and format it to "yyyy-MM-dd" format
+        String formattedDate = dateFormat.format(new Date());
+        // Parse the formatted date string back into a Date object
+        Date parsedDate = dateFormat.parse(formattedDate);
+        order.setDate(parsedDate);
 
 
 
@@ -95,6 +105,7 @@ public class CartItemsController {
     public ResponseEntity<Orders> genarateReciept(@PathVariable("id") int id,@RequestParam("userId") int userId){
         return orderService.findOrderByIdAndUserId(id,userId);
     }
+
 
 
     @PostMapping("/selectedList")
@@ -123,6 +134,12 @@ public class CartItemsController {
     public ResponseEntity<List<Orders>> getOrders(@PathVariable("id") int userId){
         return  orderService.findOrdersByUser(userId);
 
+    }
+
+    @GetMapping("/getOrderById/{id}")
+    public ResponseEntity<Orders>gedOrderReciept(@PathVariable("id")String id){
+        Long orderId = Long.parseLong(id);
+        return orderService.findBYOrderId(orderId);
     }
 
 

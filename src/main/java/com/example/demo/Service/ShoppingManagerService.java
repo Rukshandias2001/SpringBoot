@@ -8,6 +8,8 @@ import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 
 public interface ShoppingManagerService {
@@ -44,4 +46,13 @@ public interface ShoppingManagerService {
 
     public ResponseEntity<List<PieChartDTO>> getSoldPercentage();
 
+    public ResponseEntity<List<Orders>> getListOfOrders();
+
+    public ResponseEntity<String> getEmailBYOrderId(int order_id);
+
+    public ResponseEntity<HashMap<String,Double>> getTotalAmountOfElectronicsAndClothings();
+
+    public ResponseEntity<HashMap<String,Double>> getTotalAmountOfElectronics();
+
+    public ResponseEntity<HashMap<String ,Double>> getTotalAmountOfClothing();
 }

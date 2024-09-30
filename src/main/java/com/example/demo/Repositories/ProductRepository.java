@@ -39,4 +39,6 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     void updateProductOrdersList(@Param("ordersList") List<Orders> ordersList, @Param("id") Long id);
 
 
+
+
 }

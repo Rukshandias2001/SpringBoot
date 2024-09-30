@@ -1,16 +1,12 @@
 package com.example.demo.Service;
 
-import com.cloudinary.api.ApiResponse;
 import com.example.demo.Entities.*;
 import com.example.demo.Repositories.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
-import jakarta.persistence.TypedQuery;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +26,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     OrderListRepository orderListRepository;
 
+
     @PersistenceContext
     EntityManager entityManager;
 
@@ -45,6 +42,12 @@ public class OrderServiceImpl implements OrderService {
     public ResponseEntity<Orders> findOrderByIdAndUserId(int orderId, int userId) {
         Orders orderByOrderIdAndUserId = orderRepository.findOrderByOrderIdAndUserId(orderId, userId);
         return ResponseEntity.ok().body(orderByOrderIdAndUserId);
+    }
+
+    @Override
+    public ResponseEntity<Orders> findBYOrderId(Long id) {
+        Orders orders = orderRepository.findById(id).get();
+        return ResponseEntity.ok().body(orders);
     }
 
     @Override
@@ -67,9 +70,6 @@ public class OrderServiceImpl implements OrderService {
         List<Orders> ordersByUserId = orderRepository.findOrdersByUserId(id);
         return ResponseEntity.ok(ordersByUserId) ;
     }
-
-
-
 
 
     @Override
@@ -155,7 +155,25 @@ public class OrderServiceImpl implements OrderService {
         }
 
         System.out.println("Order processed successfully.");
+        upateProduct(orderList,savedOrder.getOrderId());
         return ResponseEntity.ok().body(savedOrder);
+
+    }
+
+    private void upateProduct(ArrayList<OrderedList> orderList,int orderId) {
+       orderList.forEach((data)->{
+           String sql = "select s.* from product_order_table p INNER JOIN `Order` o  ON o.order_id = p.order_id INNER JOIN product s ON p.product_id = s.product_id where  s.image='" +data.getImageUrl()+ "' AND o.order_id =" +orderId;
+           List <Object[]> resultList = entityManager.createNativeQuery(sql).getResultList();
+           Product p1 = new Product();
+           for (Object[] objects : resultList) {
+               Long productId = (Long) objects[3];
+               Product product = productRepository.findById(productId.intValue()).get();
+               int quantity = product.getQuantity();
+               quantity = quantity - data.getQuantity();
+               product.setQuantity(quantity);
+               productRepository.save(product);
+           }
+       });
     }
 
 

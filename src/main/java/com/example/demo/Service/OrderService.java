@@ -18,4 +18,6 @@ public interface OrderService {
     public  ResponseEntity<List<Orders>> findOrdersByUser(int id);
     public ResponseEntity<Orders> saveOrder(Orders order, ArrayList<Product>listOfProductsIds, String creditCardId, User customer, ArrayList<OrderedList> orderedLists);
     public ResponseEntity<Orders> findOrderByIdAndUserId(int id,int userId);
+    public ResponseEntity<Orders> findBYOrderId(Long id);
+
 }

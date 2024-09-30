@@ -23,10 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Qualifier
 @Service
@@ -45,7 +42,6 @@ public class WestminsterShoppingManagerServiceImpl implements ShoppingManagerSer
     @Autowired
     public void setCloudinary(CloudinaryConfig thecloudinaryConfig) {
         this.cloudinaryConfig = thecloudinaryConfig;
-
 
     }
 
@@ -112,8 +108,6 @@ public class WestminsterShoppingManagerServiceImpl implements ShoppingManagerSer
     public ResponseEntity<List<Product>> getClothings() {
         List <Product> listOfClothes = productRepository.getAllClothings();
         return ResponseEntity.ok().body(listOfClothes);
-
-
     }
 
 
@@ -216,7 +210,7 @@ public class WestminsterShoppingManagerServiceImpl implements ShoppingManagerSer
 
     public ResponseEntity<List<DashboardDTORequest>> getData(){
         ArrayList<DashboardDTORequest> listOfItems = new ArrayList<>();
-        String sql ="select p.product_name, p.type,p.product_id , SUM(p.quantity*p.price) AS total_Price ,SUM(p.quantity) AS total_quantity,p.price \n" +
+        String sql ="select p.product_name, p.type,p.product_id , SUM(o.quantity*p.price) AS total_Price ,SUM(o.quantity) AS total_quantity,p.price \n" +
                     "from ordered_product_list  o INNER JOIN product p \n" +
                     "ON o.image = p.image \n" +
                     "GROUP by p.product_name ,p.type,p.product_id ,p.price order by total_quantity desc";
@@ -267,6 +261,60 @@ public class WestminsterShoppingManagerServiceImpl implements ShoppingManagerSer
 
         return ResponseEntity.ok().body(listOfPercentages);
     }
+
+    @Override
+    public ResponseEntity<List<Orders>> getListOfOrders() {
+
+        List<Orders> all = orderRepository.findOrdersDesc();
+        return all.isEmpty() ? ResponseEntity.ok().body(null) : ResponseEntity.ok().body(all);
+    }
+
+    @Override
+    public ResponseEntity<String> getEmailBYOrderId(int order_id) {
+        String query = "select u.email from `order` o Inner JOIN user u ON o.user_id=u.user_id AND o.order_id = "+order_id;
+        Query nativeQuery = entityManager.createNativeQuery(query);
+        List resultList = nativeQuery.getResultList();
+        String email = (String) resultList.get(0);
+        return ResponseEntity.ok().body(email);
+
+    }
+
+    public ResponseEntity<HashMap<String,Double>> getTotalAmountOfElectronicsAndClothings(){
+        String query = "select extract(MONTH from o.created_date) as Month,SUM(od.price) as Monthly_Income from ordered_product_list od Inner join `order` o  ON od.order_id = o.order_id   Group by Month";
+        Query nativeQuery = entityManager.createNativeQuery(query);
+        List<Object[]> resultList = nativeQuery.getResultList();
+        HashMap<String,Double> listOfAmounts = new HashMap<>();
+        for (Object[] list:resultList){
+            listOfAmounts.put(list[0].toString(), (Double) list[1]);
+        }
+        return ResponseEntity.ok().body(listOfAmounts);
+    }
+
+    public ResponseEntity<HashMap<String,Double>> getTotalAmountOfElectronics(){
+        String query = "select extract(MONTH from o.created_date) as Month,SUM(od.price) as Monthly_Income from ordered_product_list od Inner join `order` o  ON od.order_id = o.order_id where od.type = 'Electronics' Group by Month";
+        Query nativeQuery = entityManager.createNativeQuery(query);
+        List <Object[]>resultList = nativeQuery.getResultList();
+        HashMap<String,Double> listOfAmounts = new HashMap<>();
+        for(Object [] list : resultList){
+            listOfAmounts.put(list[0].toString(),(Double) list[1]);
+
+        }
+        return ResponseEntity.ok().body(listOfAmounts);
+    }
+
+    public ResponseEntity<HashMap<String ,Double>> getTotalAmountOfClothing(){
+        String query = "select extract(MONTH from o.created_date) as Month,SUM(od.price) as Monthly_Income from ordered_product_list od Inner join `order` o  ON od.order_id = o.order_id where od.type = 'Clothings' Group by Month";
+        Query nativeQuery = entityManager.createNativeQuery(query);
+        List<Object[]> resultList = nativeQuery.getResultList();
+        HashMap<String,Double> listOfAmounts = new HashMap<>();
+        for(Object [] list : resultList){
+            listOfAmounts.put(list[0].toString(),(Double) list[1]);
+        }
+        return ResponseEntity.ok().body(listOfAmounts);
+    }
+
+
+
 
 
 }

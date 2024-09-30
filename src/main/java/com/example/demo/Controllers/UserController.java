@@ -6,7 +6,6 @@ import com.example.demo.Auth.AuthenticationResponse;
 import com.example.demo.Auth.AuthenticationService;
 import com.example.demo.Auth.RegisterRequest;
 import com.example.demo.Entities.Role;
-import com.example.demo.Entities.SelectedItems;
 import com.example.demo.Entities.User;
 import com.example.demo.Service.UserService;
 import lombok.Data;
@@ -67,6 +66,11 @@ public class UserController {
         int i = userService.findbyEmail(email);
         return ResponseEntity.ok().body(i);
 
+    }
+
+    @GetMapping("/getRoles/{user_id}")
+    public ResponseEntity<ArrayList<String>> getRoles(@PathVariable("user_id") int user_id){
+        return userService.getUserRoles(user_id);
     }
 
 

@@ -22,5 +22,10 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
     @Query("Select o From Orders o WHERE o.user.id=:userId")
     List<Orders> findOrdersByUserId(int userId);
 
+    @Query("SELECT o,u.email from Orders o JOIN User u ON o.user.id = u.id order by o.orderId  Desc limit  3")
+    List<Orders> findOrdersDesc();
+
+
+
 
 }

@@ -56,4 +56,6 @@ public class Orders {
 
     @OneToMany(fetch=FetchType.LAZY,mappedBy = "order")
     private List<OrderedList> orderedList;
+
+
 }
